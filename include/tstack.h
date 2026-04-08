@@ -40,4 +40,4 @@ template <typename T, int SIZE> class TStack {
     int getSize() const { return topIn + 1; }
 };
 
-#endif
+#endif // INCLUDE_TSTACK_H_
