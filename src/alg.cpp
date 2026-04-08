@@ -1,44 +1,118 @@
-// Copyright 2021 NNTU-CS
-#ifndef INCLUDE_TSTACK_H_
-#define INCLUDE_TSTACK_H_
-#define SIZE 100
+// Copyright 2025 NNTU-CS
+#include <string>
+#include <map>
+#include "tstack.h"
 
-template <typename T> class TStack {
- private:
-  T stack[SIZE];
-  int topIn;
-
- public:
-  TStack() : topIn(-1) {}
-
-  int push(T value) {
-    if (topIn >= SIZE - 1) {
-      throw std::runtime_error("Stack overflow!");
+int getPriority(char op) {
+    switch (op) {
+        case '(': return 0;
+        case ')': return 1;
+        case '+': return 2;
+        case '-': return 2;
+        case '*': return 3;
+        case '/': return 3;
+        default: return -1;
     }
-    stack[++topIn] = value;
-    return 0;
-  }
+}
 
-  T pop() {
-    if (isEmpty()) {
-      throw std::runtime_error("Stack is empty!!");
+std::string infx2pstfx(const std::string& inf) {
+    TStack<char, 100> stack;
+    std::string result = "";
+    
+    for (size_t i = 0; i < inf.length(); i++) {
+        char ch = inf[i];
+ 
+        if (ch == ' ') {
+            continue;
+        }
+
+        if (isdigit(ch)) {
+            while (i < inf.length() && isdigit(inf[i])) {
+                result += inf[i];
+                i++;
+            }
+            result += ' ';
+            i--; 
+        }
+
+        else if (ch == '(') {
+            stack.push(ch);
+        }
+
+        else if (ch == ')') {
+            while (!stack.isEmpty() && stack.top() != '(') {
+                result += stack.pop();
+                result += ' ';
+            }
+            if (!stack.isEmpty() && stack.top() == '(') {
+                stack.pop(); // Удаляем '('
+            }
+        }
+
+        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+            while (!stack.isEmpty() && getPriority(stack.top()) >= getPriority(ch)) {
+                result += stack.pop();
+                result += ' ';
+            }
+            stack.push(ch);
+        }
     }
-    return stack[topIn--];
-  }
 
-  T top() const {
-    if (isEmpty()) {
-      throw std::runtime_error("Stack is empty!");
+    while (!stack.isEmpty()) {
+        result += stack.pop();
+        result += ' ';
     }
-    return stack[topIn];
-  }
 
-  bool isEmpty() const { return topIn == -1; }
+    if (!result.empty() && result.back() == ' ') {
+        result.pop_back();
+    }
+    
+    return result;
+}
 
-  bool isFull() const { 4 return topIn == SIZE - 1; }
-  bool isFull() const { return topInd == SIZE - 1; }
+int eval(const std::string& pref) {
+    TStack<int, 100> stack;
+    
+    for (size_t i = 0; i < pref.length(); i++) {
+        char ch = pref[i];
 
-  int getSize() const { return topInd + 1; }
-};
+        if (ch == ' ') {
+            continue;
+        }
+        
 
-#endif // INCLUDE_TSTACK_H_
+        if (isdigit(ch)) {
+            int number = 0;
+            while (i < pref.length() && isdigit(pref[i])) {
+                number = number * 10 + (pref[i] - '0');
+                i++;
+            }
+            stack.push(number);
+            i--; 
+        }
+
+        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+            int operand2 = stack.pop();
+            int operand1 = stack.pop();
+            int result = 0;
+            
+            switch (ch) {
+                case '+':
+                    result = operand1 + operand2;
+                    break;
+                case '-':
+                    result = operand1 - operand2;
+                    break;
+                case '*':
+                    result = operand1 * operand2;
+                    break;
+                case '/':
+                    result = operand1 / operand2;
+                    break;
+            }
+            stack.push(result);
+        }
+    }
+    
+    return stack.pop();
+}
