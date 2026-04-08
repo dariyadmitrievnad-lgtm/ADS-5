@@ -20,7 +20,7 @@ std::string infx2pstfx(const std::string& inf) {
     TStack<char, 100> stack;
     std::string result = "";
 
-    for (size_t i = 0; i < inf.length(); i++) {
+    for (size_t i = 0; i < inf.length(); ++i) {
         char ch = inf[i];
 
         if (ch == ' ') {
@@ -30,10 +30,10 @@ std::string infx2pstfx(const std::string& inf) {
         if (isdigit(ch)) {
             while (i < inf.length() && isdigit(inf[i])) {
                 result += inf[i];
-                i++;
+                ++i;
             }
             result += ' ';
-            i--;
+            --i;
         } else if (ch == '(') {
             stack.push(ch);
         } else if (ch == ')') {
@@ -45,8 +45,7 @@ std::string infx2pstfx(const std::string& inf) {
                 stack.pop();
             }
         } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
-            while (!stack.isEmpty() &&
-                   getPriority(stack.top()) >= getPriority(ch)) {
+            while (!stack.isEmpty() && getPriority(stack.top()) >= getPriority(ch)) {
                 result += stack.pop();
                 result += ' ';
             }
@@ -69,7 +68,7 @@ std::string infx2pstfx(const std::string& inf) {
 int eval(const std::string& pref) {
     TStack<int, 100> stack;
 
-    for (size_t i = 0; i < pref.length(); i++) {
+    for (size_t i = 0; i < pref.length(); ++i) {
         char ch = pref[i];
 
         if (ch == ' ') {
@@ -80,28 +79,20 @@ int eval(const std::string& pref) {
             int number = 0;
             while (i < pref.length() && isdigit(pref[i])) {
                 number = number * 10 + (pref[i] - '0');
-                i++;
+                ++i;
             }
             stack.push(number);
-            i--;
+            --i;
         } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
             int operand2 = stack.pop();
             int operand1 = stack.pop();
             int result = 0;
 
             switch (ch) {
-                case '+':
-                    result = operand1 + operand2;
-                    break;
-                case '-':
-                    result = operand1 - operand2;
-                    break;
-                case '*':
-                    result = operand1 * operand2;
-                    break;
-                case '/':
-                    result = operand1 / operand2;
-                    break;
+                case '+': result = operand1 + operand2; break;
+                case '-': result = operand1 - operand2; break;
+                case '*': result = operand1 * operand2; break;
+                case '/': result = operand1 / operand2; break;
             }
             stack.push(result);
         }
