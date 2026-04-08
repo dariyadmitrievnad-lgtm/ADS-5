@@ -2,9 +2,42 @@
 #ifndef INCLUDE_TSTACK_H_
 #define INCLUDE_TSTACK_H_
 
-template<typename T, int size>
-class TStack {
-  // добавьте код стека
+#include <stdexcept>
+
+template <typename T, int SIZE> class TStack {
+ private:
+    T stack[SIZE];
+    int topIn;
+
+ public:
+    TStack() : topIn(-1) {}
+
+    void push(T value) {
+        if (topIn >= SIZE - 1) {
+            throw std::runtime_error("Stack overflow!");
+        }
+        stack[++topIn] = value;
+    }
+
+    T pop() {
+        if (isEmpty()) {
+            throw std::runtime_error("Stack is empty!");
+        }
+        return stack[topIn--];
+    }
+
+    T top() const {
+        if (isEmpty()) {
+            throw std::runtime_error("Stack is empty!");
+        }
+        return stack[topIn];
+    }
+
+    bool isEmpty() const { return topIn == -1; }
+
+    bool isFull() const { return topIn == SIZE - 1; }
+
+    int getSize() const { return topIn + 1; }
 };
 
-#endif  // INCLUDE_TSTACK_H_
+#endif
